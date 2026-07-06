@@ -1,0 +1,372 @@
+<style>
+  .vz{
+    --page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+    --grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,0.10);
+    --fa:#2a78d6;--al:#1baf7a;--vf:#eda100;
+    --good-bg:rgba(12,163,12,0.10);--good-ink:#006300;
+    --warn-bg:rgba(250,178,25,0.16);--warn-ink:#8a5a10;
+    --crit-bg:rgba(208,57,43,0.10);--crit:#c0392b;
+    --font:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){.vz{
+    --page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;
+    --grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,0.10);
+    --fa:#3987e5;--al:#199e70;--vf:#c98500;
+    --good-bg:rgba(12,163,12,0.14);--good-ink:#0ca30c;
+    --warn-bg:rgba(250,178,25,0.14);--warn-ink:#fab219;
+    --crit-bg:rgba(230,103,103,0.14);--crit:#e66767;
+  }}
+  :root[data-theme="light"] .vz{--page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+    --grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,0.10);--fa:#2a78d6;--al:#1baf7a;--vf:#eda100;
+    --good-ink:#006300;--warn-ink:#8a5a10;--crit:#c0392b;
+    --good-bg:rgba(12,163,12,0.10);--warn-bg:rgba(250,178,25,0.16);--crit-bg:rgba(208,57,43,0.10);}
+  :root[data-theme="dark"] .vz{--page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;
+    --grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,0.10);--fa:#3987e5;--al:#199e70;--vf:#c98500;
+    --good-ink:#0ca30c;--warn-ink:#fab219;--crit:#e66767;
+    --good-bg:rgba(12,163,12,0.14);--warn-bg:rgba(250,178,25,0.14);--crit-bg:rgba(230,103,103,0.14);}
+
+  .vz{background:var(--page);color:var(--ink);font-family:var(--font);line-height:1.55;
+    -webkit-font-smoothing:antialiased;padding:32px 20px 72px;}
+  .wrap{max-width:960px;margin:0 auto;}
+  .vz h1{font-size:27px;font-weight:700;letter-spacing:-.01em;margin:0 0 6px;}
+  .vz h2{font-size:19px;font-weight:660;margin:46px 0 14px;letter-spacing:-.005em;}
+  .vz h2 .n{color:var(--muted);font-weight:600;font-size:15px;margin-right:8px;}
+  .sub{color:var(--ink2);font-size:14.5px;margin:0;}
+  .meta{color:var(--muted);font-size:12.5px;margin:8px 0 0;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;}
+  p.lead{font-size:14px;color:var(--ink2);margin:0 0 6px;}
+
+  .method{padding:16px 18px;margin-top:22px;font-size:13px;color:var(--ink2);}
+  .method b{color:var(--ink);}
+  .method .row{padding:7px 0;border-top:1px solid var(--border);}
+  .method .row:first-child{border-top:none;padding-top:2px;}
+  .fix{display:inline-block;background:var(--crit-bg);color:var(--crit);font-weight:640;
+    font-size:11.5px;padding:1px 7px;border-radius:5px;margin-right:6px;}
+
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+  .api-card{padding:16px;}
+  .api-name{display:flex;align-items:center;gap:8px;font-weight:680;font-size:15px;}
+  .swatch{width:11px;height:11px;border-radius:3px;flex:0 0 auto;}
+  .api-tag{font-size:11px;color:var(--muted);margin-left:auto;}
+  .api-head{font-size:12.5px;color:var(--ink2);margin:10px 0 12px;min-height:52px;}
+  .kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-top:1px solid var(--border);}
+  .kv:first-of-type{border-top:none;}
+  .kv b{font-variant-numeric:tabular-nums;font-weight:640;}
+  .win{color:var(--good-ink);}
+
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin:0 0 8px;}
+  .legend span{display:inline-flex;align-items:center;gap:7px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+  svg{display:block;width:100%;height:auto;overflow:visible;}
+  .bar-val{font-size:11px;font-weight:640;fill:var(--ink);font-variant-numeric:tabular-nums;}
+  .ax{font-size:11.5px;fill:var(--muted);}
+  .axb{font-size:12.5px;fill:var(--ink2);font-weight:560;}
+  .note{font-size:12px;color:var(--muted);margin-top:8px;}
+
+  .twrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:13px;}
+  thead th{background:var(--surface);text-align:left;font-weight:640;color:var(--ink2);
+    padding:10px 12px;border-bottom:1.5px solid var(--axis);white-space:nowrap;}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--grid);vertical-align:middle;font-variant-numeric:tabular-nums;}
+  tbody tr:last-child td{border-bottom:none;}
+  .reg{font-weight:650;font-variant-numeric:normal;}
+  .best{color:var(--good-ink);font-weight:660;}
+  .pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11.5px;font-weight:600;}
+  .p-vf{background:var(--warn-bg);color:var(--warn-ink);}
+  .p-fa{background:rgba(42,120,214,.14);color:var(--fa);}
+  .p-tie{background:rgba(137,135,129,.16);color:var(--muted);}
+
+  .callout{border-left:3px solid var(--vf);padding:13px 16px;background:var(--surface);
+    border-radius:0 10px 10px 0;margin-top:12px;font-size:13px;color:var(--ink2);}
+  .callout b{color:var(--ink);}
+  .callout code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:rgba(137,135,129,.16);
+    padding:1px 5px;border-radius:4px;}
+
+  .concl{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;}
+  .cc{padding:16px 18px;}
+  .cc h3{margin:0 0 8px;font-size:15px;font-weight:680;display:flex;align-items:center;gap:8px;}
+  .cc ul{margin:0;padding-left:17px;font-size:13px;color:var(--ink2);}
+  .cc li{margin:5px 0;}
+  .verdict-line{font-size:14px;color:var(--ink);background:var(--good-bg);border-radius:10px;
+    padding:14px 16px;margin-top:14px;}
+
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px;}
+  .tile{padding:14px 15px;text-align:left;}
+  .tile .big{font-size:26px;font-weight:700;letter-spacing:-.02em;}
+  .tile .lab{font-size:12px;color:var(--muted);margin-top:2px;}
+  .distbars{margin-top:14px;}
+  .db-row{display:flex;align-items:center;gap:10px;font-size:12.5px;margin:5px 0;}
+  .db-row .k{width:80px;color:var(--ink2);flex:0 0 auto;}
+  .db-track{flex:1;background:var(--grid);border-radius:5px;height:16px;overflow:hidden;}
+  .db-fill{height:100%;border-radius:5px;}
+  .db-v{width:70px;flex:0 0 auto;color:var(--muted);font-variant-numeric:tabular-nums;}
+
+  details{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-top:10px;overflow:hidden;}
+  summary{padding:13px 16px;cursor:pointer;font-weight:620;font-size:14px;list-style:none;
+    display:flex;align-items:center;gap:10px;}
+  summary::-webkit-details-marker{display:none;}
+  summary .chev{transition:transform .15s;color:var(--muted);}
+  details[open] summary .chev{transform:rotate(90deg);}
+  summary .cnt{margin-left:auto;font-size:12px;color:var(--muted);font-weight:500;}
+  .qgrid{padding:4px 16px 14px;}
+  .qrow{display:flex;gap:10px;font-size:12.5px;padding:6px 0;border-top:1px solid var(--grid);align-items:baseline;}
+  .qrow:first-child{border-top:none;}
+  .qno{font-weight:640;width:66px;flex:0 0 auto;font-variant-numeric:tabular-nums;}
+  .qrt{width:100px;flex:0 0 auto;color:var(--ink2);font-variant-numeric:tabular-nums;}
+  .qct{color:var(--muted);}
+
+  .lim{padding:15px 18px;font-size:12.5px;color:var(--ink2);margin-top:12px;}
+  .lim li{margin:5px 0;}
+  .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;background:var(--ink);
+    color:var(--page);font-size:12px;padding:6px 9px;border-radius:7px;z-index:50;white-space:nowrap;
+    font-variant-numeric:tabular-nums;box-shadow:0 4px 14px rgba(0,0,0,.25);}
+  @media (max-width:680px){.cards,.concl,.tiles{grid-template-columns:1fr 1fr;} .tiles{grid-template-columns:1fr 1fr;}}
+  @media (max-width:520px){.cards,.concl{grid-template-columns:1fr;}}
+</style>
+
+<div class="vz">
+<div class="wrap">
+
+  <h1>航班状态 API 终评:FlightAware · VariFlight · AirLabs</h1>
+  <p class="sub">30 条真实航班 · 5 大地区 · 10 个国家 · 去偏「留一法共识」逐字段评分 · OpenSky ADS-B 独立锚点</p>
+  <p class="meta">测试日期 2026-07-06 · 时间统一 UTC · AeroDataBox 因无 key 未纳入 · 数据源:FlightAware(REST)/ VariFlight(MCP)/ AirLabs(经 Migoo)/ OpenSky(社区 ADS-B)</p>
+
+  <!-- 方法 -->
+  <div class="card method">
+    <div class="row"><b>怎么打分(去掉「谁当标准答案」的循环偏差):</b> 用<b>留一法共识</b>——给某家某字段打分时,真值由<b>其余各家的一致意见</b>决定,被评者不参与定义自己的真值。任何一家都无法自证。实时位置另用 <b>OpenSky 社区 ADS-B</b> 独立核对,与三家商业 API 完全无关。</div>
+  </div>
+
+  <!-- 三家概览 -->
+  <div class="cards">
+    <div class="card api-card">
+      <div class="api-name"><span class="swatch" style="background:var(--fa)"></span>FlightAware<span class="api-tag">REST</span></div>
+      <div class="api-head">覆盖最广、时间最准。全球基础状态底座首选;弱在东南亚廉航与亚洲早班 UTC 跨日错位。</div>
+      <div class="kv"><span>覆盖率</span><b class="win">27/30 · 90%</b></div>
+      <div class="kv"><span>起飞时间准确</span><b class="win">100%</b></div>
+      <div class="kv"><span>状态准确</span><b>79%</b></div>
+      <div class="kv"><span>字段丰富度</span><b>中</b></div>
+    </div>
+    <div class="card api-card">
+      <div class="api-name"><span class="swatch" style="background:var(--vf)"></span>VariFlight 飞常准<span class="api-tag">MCP</span></div>
+      <div class="api-head">字段最深、中国最强。含天气/准点率/延误原因/尾号;亚洲覆盖持平 FA 且早班更准。弱在东南亚廉航、集成重。</div>
+      <div class="kv"><span>覆盖率</span><b>25/30 · 83%</b></div>
+      <div class="kv"><span>中国覆盖</span><b class="win">6/6 · 最高</b></div>
+      <div class="kv"><span>字段丰富度</span><b class="win">高(70+ 字段)</b></div>
+      <div class="kv"><span>状态准确</span><b>73%</b></div>
+    </div>
+    <div class="card api-card">
+      <div class="api-name"><span class="swatch" style="background:var(--al)"></span>AirLabs<span class="api-tag">REST</span></div>
+      <div class="api-head">状态最准、实时坐标内联。在飞航班一次给经纬度/速度。弱在覆盖最低,冷门/未起飞缺数据。</div>
+      <div class="kv"><span>覆盖率</span><b>23/30 · 77%</b></div>
+      <div class="kv"><span>状态准确</span><b class="win">92%</b></div>
+      <div class="kv"><span>起飞时间准确</span><b>83%</b></div>
+      <div class="kv"><span>字段丰富度</span><b>中</b></div>
+    </div>
+  </div>
+
+  <!-- 核心指标 -->
+  <h2><span class="n">01</span>核心指标(逐字段准确度)</h2>
+  <div class="card" style="padding:18px 16px 14px;">
+    <div class="legend">
+      <span><i class="dot" style="background:var(--fa)"></i>FlightAware</span>
+      <span><i class="dot" style="background:var(--vf)"></i>VariFlight</span>
+      <span><i class="dot" style="background:var(--al)"></i>AirLabs</span>
+    </div>
+    <figure style="margin:0;"><svg id="c1" viewBox="0 0 720 300" role="img"
+      aria-label="覆盖率、状态准确、起飞时间准确、字段完整度 四项三家对比"></svg></figure>
+    <p class="note">航线一项三家均 20/20(去偏后无差异),故不入图。状态/时间分母为「达成留一共识的条数」。</p>
+  </div>
+
+  <!-- 字段丰富度 -->
+  <h2><span class="n">02</span>字段丰富度(单条返回的可用字段数,约)</h2>
+  <div class="card" style="padding:18px 16px 14px;">
+    <figure style="margin:0;"><svg id="c2" viewBox="0 0 720 160" role="img"
+      aria-label="字段数:FlightAware 约15、AirLabs 约18、VariFlight 约70"></svg></figure>
+    <p class="note">VariFlight 单条含准点率、机场天气、飞行距离/时长、延误原因、预计登机时间、餐食、最快出关、机场经纬度、中文航司名、值机柜台、尾号等 70+ 字段。</p>
+  </div>
+
+  <!-- 分地区 -->
+  <h2><span class="n">03</span>分地区覆盖对比</h2>
+  <div class="card" style="padding:18px 16px 14px;">
+    <div class="legend">
+      <span><i class="dot" style="background:var(--fa)"></i>FlightAware</span>
+      <span><i class="dot" style="background:var(--vf)"></i>VariFlight</span>
+      <span><i class="dot" style="background:var(--al)"></i>AirLabs</span>
+    </div>
+    <figure style="margin:0;"><svg id="c3" viewBox="0 0 720 290" role="img"
+      aria-label="各地区覆盖率:日本三家100%,中国VariFlight最高,美洲FlightAware领先"></svg></figure>
+  </div>
+  <div class="twrap" style="margin-top:14px;">
+    <table>
+      <thead><tr><th>地区</th><th>条数</th><th>FlightAware</th><th>VariFlight</th><th>AirLabs</th><th>本区结论</th></tr></thead>
+      <tbody id="regtable"></tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <b>亚洲早班:VariFlight 比 FlightAware 更准。</b> JL501 / JL107(日本清晨 HND 出发)本地 7/6 已落地,但 FlightAware 按 UTC 计日落到 <code>07-06T21:35Z</code> 那班(其实是本地 7/7 早上、还没飞),显示「已排班」;VariFlight 与 AirLabs 均正确显示「已落地」。凡 UTC 以东、清晨起飞的航班(日本/中国早班),用 FlightAware 必须自己做时区换算,否则取错班次。
+  </div>
+
+  <!-- 结论 -->
+  <h2><span class="n">04</span>结论:亚洲 vs 美洲</h2>
+  <p class="lead">核心问题:是不是「亚洲飞常准覆盖精度追平 FlightAware、字段更丰富,美洲不一样」?—— 数据回答:<b style="color:var(--ink)">是的。</b></p>
+  <div class="concl">
+    <div class="cc card" style="border-color:var(--vf);border-width:1.5px;">
+      <h3><span class="swatch" style="background:var(--vf)"></span>亚洲 → VariFlight</h3>
+      <ul>
+        <li><b>覆盖持平或领先</b>:日本三家均 5/5;中国 VariFlight 6/6 最高</li>
+        <li><b>早班更准</b>:日本清晨航班 FA 时区错位,VariFlight 正确</li>
+        <li><b>字段碾压</b>:天气 / 准点率 / 延误原因 / 尾号 / 值机,FA 与 AirLabs 都没有</li>
+        <li>代价:MCP 非 REST,集成成本高</li>
+      </ul>
+    </div>
+    <div class="cc card" style="border-color:var(--fa);border-width:1.5px;">
+      <h3><span class="swatch" style="background:var(--fa)"></span>美洲 → FlightAware</h3>
+      <ul>
+        <li><b>覆盖领先</b>:美国 6/6、巴西 4/4;VariFlight 漏西南复用号 WN2、巴西支线 AD4002</li>
+        <li><b>时间最准</b>:起飞时间 100%,状态更新也更及时</li>
+        <li>VariFlight 在美洲只赢字段,覆盖与实时状态均落后</li>
+        <li>标准 REST,集成最省事</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verdict-line">
+    <b>一句话选型:</b> 亚洲(尤其中国 / 日本)用 <b style="color:var(--vf)">VariFlight</b> —— 覆盖不输、早班更准、字段最深;美洲及全球基础覆盖用 <b style="color:var(--fa)">FlightAware</b> —— 覆盖最广、时间最准;要在飞实时坐标补 <b style="color:var(--al)">AirLabs</b>。三家主备互补最稳。
+  </div>
+
+  <!-- 分布 -->
+  <h2><span class="n">05</span>样本分布</h2>
+  <div class="tiles">
+    <div class="card tile"><div class="big">30</div><div class="lab">航班总数</div></div>
+    <div class="card tile"><div class="big">10</div><div class="lab">涉及国家</div></div>
+    <div class="card tile"><div class="big">5</div><div class="lab">地区</div></div>
+    <div class="card tile"><div class="big">30</div><div class="lab">机场</div></div>
+  </div>
+  <div class="card distbars" style="padding:16px 18px;">
+    <div style="font-size:12.5px;color:var(--ink2);font-weight:600;margin-bottom:6px;">按航班状态(实测当时)</div>
+    <div id="dist-state"></div>
+    <div style="font-size:12.5px;color:var(--ink2);font-weight:600;margin:14px 0 6px;">按地区</div>
+    <div id="dist-region"></div>
+    <div style="font-size:12.5px;color:var(--ink2);font-weight:600;margin:14px 0 6px;">按航司类型 / 航段</div>
+    <div id="dist-class"></div>
+  </div>
+
+  <!-- 折叠 query 清单 -->
+  <h2><span class="n">06</span>测试用例清单(query 与涉及国家)</h2>
+  <p class="note" style="margin-bottom:4px;">点击展开每个地区。每条 query = 航班号 + 日期(2026-07-06),三家用同一口径查询。</p>
+  <div id="queries"></div>
+
+
+</div>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+(function(){
+  const cs=getComputedStyle(document.querySelector('.vz'));
+  const col=n=>cs.getPropertyValue(n).trim();
+  const tip=document.getElementById('tip');
+  const show=(e,h)=>{tip.innerHTML=h;tip.style.opacity=1;tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-10)+'px';};
+  const hide=()=>tip.style.opacity=0;
+  const SER=[['fa','FlightAware',col('--fa')],['vf','VariFlight',col('--vf')],['al','AirLabs',col('--al')]];
+
+  function groupedPct(id,cats,data,vb){
+    const svg=document.getElementById(id);
+    const W=720,H=vb,mL=40,mR=12,mT=16,mB=44,pw=W-mL-mR,ph=H-mT-mB;
+    const y=v=>mT+ph-(v/100)*ph;
+    let s='';
+    [0,25,50,75,100].forEach(g=>{
+      s+=`<line x1="${mL}" x2="${W-mR}" y1="${y(g)}" y2="${y(g)}" stroke="${col('--grid')}" stroke-width="1"/>`;
+      s+=`<text class="ax" x="${mL-8}" y="${y(g)+4}" text-anchor="end">${g}</text>`;
+    });
+    s+=`<line x1="${mL}" x2="${W-mR}" y1="${y(0)}" y2="${y(0)}" stroke="${col('--axis')}" stroke-width="1.5"/>`;
+    const gw=pw/cats.length,bw=Math.min(42,gw/4.2),gap=8,groupW=bw*3+gap*2;
+    cats.forEach((cat,i)=>{
+      const gx=mL+gw*i+(gw-groupW)/2;
+      SER.forEach((se,j)=>{
+        const v=data[i][se[0]],bx=gx+j*(bw+gap),by=y(v),bh=y(0)-by;
+        if(v>0){s+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="4" fill="${se[2]}"
+          data-t="${se[1]} · ${cat}: <b>${v}%</b>"/>`;}
+        else{s+=`<rect x="${bx}" y="${y(0)-3}" width="${bw}" height="3" rx="1.5" fill="${se[2]}" opacity=".35"/>`;}
+        s+=`<text class="bar-val" x="${bx+bw/2}" y="${v>0?by-5:y(0)-7}" text-anchor="middle">${v}</text>`;
+      });
+      s+=`<text class="axb" x="${mL+gw*i+gw/2}" y="${H-mB+22}" text-anchor="middle">${cat}</text>`;
+    });
+    svg.innerHTML=s;
+    svg.querySelectorAll('rect[data-t]').forEach(el=>{
+      el.addEventListener('mousemove',e=>show(e,el.getAttribute('data-t')));el.addEventListener('mouseleave',hide);});
+  }
+
+  // 01 核心指标
+  groupedPct('c1',['覆盖率','状态准确','起飞时间准确','字段完整度'],
+    [{fa:90,vf:83,al:77},{fa:79,vf:73,al:92},{fa:100,vf:86,al:83},{fa:83,vf:83,al:80}],300);
+  // 03 分地区覆盖
+  groupedPct('c3',['美国','日本','巴西','东南亚','中国'],
+    [{fa:100,vf:83,al:83},{fa:100,vf:100,al:100},{fa:100,vf:75,al:75},{fa:78,vf:67,al:56},{fa:83,vf:100,al:83}],290);
+
+  // 02 字段丰富度 横条
+  (function(){
+    const svg=document.getElementById('c2');const data=[['fa',15],['al',18],['vf',70]];
+    const W=720,H=160,mL=100,mR=54,mT=8,mB=14,pw=W-mL-mR,max=78,x=v=>mL+(v/max)*pw;
+    const rowH=(H-mT-mB)/3,bh=26;let s='';
+    [0,25,50,75].forEach(g=>{s+=`<line x1="${x(g)}" x2="${x(g)}" y1="${mT}" y2="${H-mB}" stroke="${col('--grid')}" stroke-width="1"/>`;
+      s+=`<text class="ax" x="${x(g)}" y="${H-2}" text-anchor="middle">${g}</text>`;});
+    data.forEach((d,i)=>{const se=SER.find(z=>z[0]===d[0]);const cy=mT+rowH*i+(rowH-bh)/2;
+      s+=`<text class="axb" x="${mL-12}" y="${cy+bh/2+4}" text-anchor="end">${se[1]}</text>`;
+      s+=`<rect x="${mL}" y="${cy}" width="${x(d[1])-mL}" height="${bh}" rx="4" fill="${se[2]}" data-t="${se[1]}: 约 ${d[1]} 字段"/>`;
+      s+=`<text class="bar-val" x="${x(d[1])+7}" y="${cy+bh/2+4}" text-anchor="start">约${d[1]}${d[0]==='vf'?'+':''}</text>`;});
+    svg.innerHTML=s;
+    svg.querySelectorAll('rect[data-t]').forEach(el=>{el.addEventListener('mousemove',e=>show(e,el.getAttribute('data-t')));el.addEventListener('mouseleave',hide);});
+  })();
+
+  // 分地区表
+  const reg=[
+    ['美国',6,'6/6','5/6','5/6','fa','FlightAware 领先'],
+    ['日本',5,'5/5','5/5','5/5','tie','三家追平 · VF 早班更准+字段深'],
+    ['巴西',4,'4/4','3/4','3/4','fa','FlightAware 领先'],
+    ['东南亚',9,'7/9','6/9','5/9','fa','FA 最好 · 廉航是共同短板'],
+    ['中国',6,'5/6','6/6','5/6','vf','VariFlight 最高'],
+  ];
+  document.getElementById('regtable').innerHTML=reg.map(r=>{
+    const [g,n,fa,vf,al,w,concl]=r;
+    const cls=w==='vf'?'p-vf':w==='fa'?'p-fa':'p-tie';
+    const mark=(who,val)=> (w===who||(w==='tie'))?`<span class="best">${val}</span>`:val;
+    return `<tr><td class="reg">${g}</td><td>${n}</td>
+      <td>${mark('fa',fa)}</td><td>${mark('vf',vf)}</td><td>${mark('al',al)}</td>
+      <td><span class="pill ${cls}">${concl}</span></td></tr>`;
+  }).join('');
+
+  // 分布条
+  function distBars(id,rows,total){
+    const el=document.getElementById(id);
+    el.innerHTML=rows.map(r=>{
+      const pct=Math.round(r[1]/total*100);
+      return `<div class="db-row"><span class="k">${r[0]}</span>
+        <span class="db-track"><span class="db-fill" style="width:${pct}%;background:${r[2]}"></span></span>
+        <span class="db-v">${r[1]} 条 · ${pct}%</span></div>`;
+    }).join('');
+  }
+  const C=[col('--fa'),col('--vf'),col('--al'),col('--muted'),col('--axis')];
+  distBars('dist-state',[['已落地',10,C[0]],['已排班',10,C[1]],['在飞',6,C[2]],['延误',1,C[3]],['无数据/未知',3,C[4]]],30);
+  distBars('dist-region',[['东南亚',9,C[0]],['美国',6,C[1]],['中国',6,C[2]],['日本',5,C[3]],['巴西',4,C[4]]],30);
+  distBars('dist-class',[['传统航司',24,C[0]],['廉航 LCC',5,C[1]],['支线',1,C[2]],['—国内',17,C[3]],['—国际',13,C[4]]],30);
+
+  // 折叠 query 清单
+  const Q={
+    '美国 (United States)':[['AA1','JFK→LAX','美国 国内'],['WN2','MDW→BWI','美国 国内'],['AA2','LAX→JFK','美国 国内'],
+      ['UA857','SFO→PVG','美国→中国'],['AA100','JFK→LHR','美国→英国'],['UA1','SFO→SIN','美国→新加坡']],
+    '日本 (Japan)':[['NH61','HND→CTS','日本 国内'],['JL501','HND→CTS','日本 国内'],['JL107','HND→ITM','日本 国内'],
+      ['JL2','HND→SFO','日本→美国'],['NH110','HND→JFK','日本→美国']],
+    '巴西 (Brazil)':[['G31002','CGH→SDU','巴西 国内'],['AD4002','VIX→CNF','巴西 国内(支线)'],
+      ['AA930','GRU→MIA','巴西→美国'],['LA8084','GRU→LHR','巴西→英国']],
+    '东南亚 (SE Asia)':[['GA406','CGK→DPS','印尼 国内'],['TG102','BKK→CNX','泰国 国内'],['5J551','MNL→CEB','菲律宾 国内'],
+      ['AK6040','KUL→JHB','马来西亚 国内'],['JT610','CGK→SUB','印尼 国内(廉航)'],['QZ7510','CGK→DPS','印尼 国内(廉航)'],
+      ['SQ22','SIN→EWR','新加坡→美国'],['SQ826','SIN→PVG','新加坡→中国'],['TG403','BKK→SIN','泰国→新加坡']],
+    '中国 (China)':[['MU5101','SHA→PEK','中国 国内'],['CA1501','PEK→SHA','中国 国内'],['CZ3001','CAN→PEK','中国 国内(号无效)'],
+      ['CA987','PEK→LAX','中国→美国'],['CA988','LAX→PEK','美国→中国'],['MU587','PVG→JFK','中国→美国']],
+  };
+  document.getElementById('queries').innerHTML=Object.entries(Q).map(([g,rows])=>{
+    const body=rows.map(r=>`<div class="qrow"><span class="qno">${r[0]}</span><span class="qrt">${r[1]}</span><span class="qct">${r[2]}</span></div>`).join('');
+    return `<details><summary><span class="chev">▶</span>${g}<span class="cnt">${rows.length} 条</span></summary><div class="qgrid">${body}</div></details>`;
+  }).join('');
+})();
+</script>
